@@ -1,5 +1,6 @@
 package SeaBattle;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +13,19 @@ public class Player {
     private List<Ship> ships;
     private Ship hitShip;
 
-    Player() {
+    public Player() {
         name = "Andrei";
+
+    }
+
+    public void start() {
         ships = new ArrayList<>();
         hitShip = new Ship(new ArrayList<>());
         shotResult = true;
-    }
-
-    public void start(){
         ownField = new GameField(Box.CELL);
         enemyField = new GameField(Box.CLOSED);
     }
+
     public void setShotResult() {
         this.shotResult = true;
     }
@@ -34,9 +37,11 @@ public class Player {
     public List<Ship> getShips() {
         return ships;
     }
+
     public GameField getOwnField() {
         return ownField;
     }
+
     public Box getEnemyFieldBox(Coordinate coordinate) {
         return enemyField.get(coordinate);
     }
@@ -83,11 +88,13 @@ public class Player {
     }
 
     public void placeShips(Ship ship) {
-        ships.add(ship);
-        ownField.addAureole(ship);
+        this.ships.add(ship);
+        this.ownField.addAureole(ship);
         for (Coordinate c : ship.getCoordinates()) {
             ownField.set(c, Box.SHIP);
         }
     }
+
+
 }
 

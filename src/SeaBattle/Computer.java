@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-class Computer {
+public class Computer {
     private String name;
     private GameField ownField;
     private GameField enemyField;
@@ -13,19 +13,21 @@ class Computer {
     private Ship hitShip;
     private List<Coordinate> shotCollection;
 
-    Computer() {
-        this.name = "Computer";
-        this.ships = new ArrayList<>();
-        this.hitShip = new Ship(new ArrayList<>());
-        this.shotCollection = new ArrayList<>();
-        this.shotResult = true;
+    public Computer() {
+        name = "Computer";
+
     }
 
     public void start() {
-        this.ownField = new GameField(Box.CELL);
-        this.enemyField = new GameField(Box.CELL);
+        ships = new ArrayList<>();
+        hitShip = new Ship(new ArrayList<>());
+        shotCollection = new ArrayList<>();
+        shotResult = true;
+        ownField = new GameField(Box.CELL);
+        enemyField = new GameField(Box.CELL);
         placeShips();
     }
+
     public boolean isShotResult() {
         return shotResult;
     }
@@ -59,7 +61,7 @@ class Computer {
 
             Ship ship = new Ship(Coordinate.coordinatesParseInt(coordinates));
             for (Coordinate coordinate : ship.getCoordinates()) {
-                ownField.set(coordinate, Box.SHIP);
+                this.ownField.set(coordinate, Box.SHIP);
             }
             this.ships.add(ship);
         }
@@ -72,13 +74,14 @@ class Computer {
         } else {
             coordinate = Ranges.getRandomCoordinate();
         }
-        if (isShotDuplicated(coordinate) ) {
+        if (isShotDuplicated(coordinate)) {
             attack(player);
         } else {
             shotCollection.add(coordinate);
             switch (player.getOwnFieldBox(coordinate)) {
                 case SHIP:
                     successfulShot(player, coordinate);
+                    break;
                 default:
                     player.getOwnField().set(coordinate, Box.MISS);
                     shotResult = false;
@@ -134,12 +137,16 @@ class Computer {
         return verticalShipKillStrategy();
     }
 
-    private Boolean isCoordinateCanBeUsed(Coordinate coordinate) {
-        if (this.getOwnFieldBox(coordinate) == Box.CLOSED) {
-            return true;
-        }
-        return false;
+    private boolean isCoordinateCanBeUsed(Coordinate coordinate) {
+        return Ranges.inRange(coordinate) && isShotDuplicated(coordinate);
     }
+
+//    private Boolean isCoordinateCanBeUsed(Coordinate coordinate) {
+//        if (this.getOwnFieldBox(coordinate) == Box.CLOSED) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     private boolean isShotDuplicated(Coordinate coordinate) {
         return shotCollection.contains(coordinate);
@@ -175,15 +182,8 @@ class Computer {
         }
     }
 
-    Box getEnemyFieldBox(Coordinate coordinate) {
-        return enemyField.get(coordinate);
-    }
-
-    Box getOwnFieldBox(Coordinate coordinate) {
+    public Box getOwnFieldBox(Coordinate coordinate) {
         return ownField.get(coordinate);
-    }
-    void set(Coordinate coordinate, Box box) {
-        ownField.set(coordinate, box);
     }
 }
 

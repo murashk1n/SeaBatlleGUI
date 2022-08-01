@@ -21,11 +21,12 @@ public class Game {
     }
 
     public void start() {
+        computer.start();
+        player.start();
         status = GameStatus.PLACING4;
         list = new ArrayList<>();
         counter = 0;
-        player.start();
-        computer.start();
+
     }
 
     public GameStatus changeStatus() {
@@ -67,7 +68,8 @@ public class Game {
                     status = GameStatus.LOOSED;
                     checkWhoWin();
                 }
-            }status = GameStatus.PLAYED;
+            }
+            status = GameStatus.PLAYED;
         }
     }
 
@@ -95,7 +97,7 @@ public class Game {
             Ship ship = new Ship(list);
             if (ship.isShipValid()) {
                 player.placeShips(ship);
-                list.clear();
+                list = new ArrayList<>();
                 counter++;
             } else {
                 status = GameStatus.NOTVALIDSHIP;
@@ -144,10 +146,6 @@ public class Game {
 
     private boolean isComputerWin() {
         return player.getShips().size() == 0;
-    }
-
-    private boolean isWinner() {
-        return isComputerWin() || isHumanWin();
     }
 
     private void checkWhoWin() {
