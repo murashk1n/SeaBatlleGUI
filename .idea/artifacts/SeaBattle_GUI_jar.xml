@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SeaBattle GUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SeaBattle_GUI_jar</output-path>
+    <root id="archive" name="SeaBattle GUI.jar">
+      <element id="module-output" name="SeaBattle GUI" />
+    </root>
+  </artifact>
+</component>

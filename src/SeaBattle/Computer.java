@@ -1,0 +1,189 @@
+package SeaBattle;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+
+class Computer {
+    private String name;
+    private GameField ownField;
+    private GameField enemyField;
+    private boolean shotResult;
+    private List<Ship> ships;
+    private Ship hitShip;
+    private List<Coordinate> shotCollection;
+
+    Computer() {
+        this.name = "Computer";
+        this.ships = new ArrayList<>();
+        this.hitShip = new Ship(new ArrayList<>());
+        this.shotCollection = new ArrayList<>();
+        this.shotResult = true;
+    }
+
+    public void start() {
+        this.ownField = new GameField(Box.CELL);
+        this.enemyField = new GameField(Box.CELL);
+        placeShips();
+    }
+    public boolean isShotResult() {
+        return shotResult;
+    }
+
+    public void setShotResult() {
+        this.shotResult = true;
+    }
+
+    public List<Ship> getShips() {
+        return ships;
+    }
+
+    private File getFile(int number) {
+        String filename = "res/coordinates/" + number + ".txt";
+        return new File(filename);
+    }
+
+    private void placeShips() {
+        int random = (int) (1 + Math.random() * 4);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(getFile(random));
+        } catch (FileNotFoundException e) {
+            System.out.println("FIle not found");
+        }
+
+        while (scanner.hasNextLine()) {
+
+            String line = scanner.nextLine();
+            String[] coordinates = line.split(("[.,:;()?!\"\\s–]+"));
+
+            Ship ship = new Ship(Coordinate.coordinatesParseInt(coordinates));
+            for (Coordinate coordinate : ship.getCoordinates()) {
+                ownField.set(coordinate, Box.SHIP);
+            }
+            this.ships.add(ship);
+        }
+    }
+
+    public void attack(Player player) {
+        Coordinate coordinate;
+        if (hitShip.isHitShip()) {
+            coordinate = chooseCoordinateToShot();
+        } else {
+            coordinate = Ranges.getRandomCoordinate();
+        }
+        if (isShotDuplicated(coordinate) ) {
+            attack(player);
+        } else {
+            shotCollection.add(coordinate);
+            switch (player.getOwnFieldBox(coordinate)) {
+                case SHIP:
+                    successfulShot(player, coordinate);
+                default:
+                    player.getOwnField().set(coordinate, Box.MISS);
+                    shotResult = false;
+            }
+        }
+    }
+
+    private void successfulShot(Player player, Coordinate coordinate) {
+        for (Ship ship : player.getShips()) {
+            if (ship.getCoordinates().contains(coordinate)) {
+                ship.getCoordinates().remove(coordinate);
+                hitShip.getCoordinates().add(coordinate);
+                if (ship.isShipAlive()) {
+                    //enemyField.set(coordinate, Box.HIT);
+                    player.getOwnField().set(coordinate, Box.HIT);
+                } else {
+                    enemyField.addAureole(hitShip);
+                    for (Coordinate coord : hitShip.getCoordinates()) {
+                        player.getOwnField().set(coordinate, Box.SUNK);
+                        //enemyField.set(coord, Box.SUNK);
+                    }
+                    player.getShips().remove(ship);
+                    hitShip = new Ship(new ArrayList<>());
+                }
+                shotResult = true;
+                break;
+            }
+        }
+    }
+
+    private Coordinate verticalShipKillStrategy() {
+        int lastElement = hitShip.getCoordinates().size() - 1;
+        Coordinate variant1 = new Coordinate(hitShip.getCoordinates().get(lastElement).x + 1, hitShip.getCoordinates().get(0).y);
+        Coordinate variant2 = new Coordinate(hitShip.getCoordinates().get(0).x - 1, hitShip.getCoordinates().get(0).y);
+        if (isCoordinateCanBeUsed(variant1)) {
+            return variant1;
+        } else if (isCoordinateCanBeUsed(variant2)) {
+            return variant2;
+        }
+        return horizontalShipKillStrategy();
+    }
+
+    private Coordinate horizontalShipKillStrategy() {
+        int lastElement = hitShip.getCoordinates().size() - 1;
+        Coordinate variant1 = new Coordinate(hitShip.getCoordinates().get(0).x, hitShip.getCoordinates().get(lastElement).y + 1);
+        Coordinate variant2 = new Coordinate(hitShip.getCoordinates().get(0).x, hitShip.getCoordinates().get(0).y - 1);
+
+        if (isCoordinateCanBeUsed(variant1)) {
+            return variant1;
+        } else if (isCoordinateCanBeUsed(variant2)) {
+            return variant2;
+        }
+        return verticalShipKillStrategy();
+    }
+
+    private Boolean isCoordinateCanBeUsed(Coordinate coordinate) {
+        if (this.getOwnFieldBox(coordinate) == Box.CLOSED) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isShotDuplicated(Coordinate coordinate) {
+        return shotCollection.contains(coordinate);
+    }
+
+    private Coordinate chooseCoordinateToShot() {
+        if (hitShip.isShipCanBeDefined()) {
+            hitShip.defineTypeOfShip();
+            Collections.sort(hitShip.getCoordinates(), new Comparator<Coordinate>() {
+                @Override
+                public int compare(Coordinate o1, Coordinate o2) {
+                    if (hitShip.getTypeOfShip() == "vertical") {
+                        return Integer.compare(o1.x, o2.x);
+                    }
+                    return Integer.compare(o1.y, o2.y);
+                }
+            });
+            if (hitShip.getTypeOfShip().equals("vertical")) {
+                return verticalShipKillStrategy();
+            } else {
+                return horizontalShipKillStrategy();
+            }
+        }
+        return chooseCoordinateAround();
+    }
+
+    private Coordinate chooseCoordinateAround() {
+        int random = (int) (0 + Math.random() * 2);
+        if (random == 0) {
+            return verticalShipKillStrategy();
+        } else {
+            return horizontalShipKillStrategy();
+        }
+    }
+
+    Box getEnemyFieldBox(Coordinate coordinate) {
+        return enemyField.get(coordinate);
+    }
+
+    Box getOwnFieldBox(Coordinate coordinate) {
+        return ownField.get(coordinate);
+    }
+    void set(Coordinate coordinate, Box box) {
+        ownField.set(coordinate, box);
+    }
+}
+
