@@ -87,7 +87,9 @@ public class Game {
     public void pressLeftButtonOnComputersField(Coordinate coordinate) {
         checkWhoWin();
         if (status == GameStatus.PLAYED) {
-            leftButtonActionOnComputersField(coordinate);
+            if (player.getEnemyFieldBox(coordinate) == Box.CLOSED) {
+                leftButtonActionOnComputersField(coordinate);
+            }
         }
     }
 
@@ -149,11 +151,11 @@ public class Game {
     }
 
     private void checkWhoWin() {
-            if (isHumanWin()) {
-                status = GameStatus.WINNER;
-            }
-            if (isComputerWin()) {
-                status = GameStatus.LOOSED;
+        if (isHumanWin()) {
+            status = GameStatus.WINNER;
+        }
+        if (isComputerWin()) {
+            status = GameStatus.LOOSED;
         }
     }
 
