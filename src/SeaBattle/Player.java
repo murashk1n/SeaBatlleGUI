@@ -76,7 +76,7 @@ public class Player {
                     enemyField.set(coordinate, Box.HIT);
                     break;
                 } else {
-                    enemyField.addAureole(hitShip);
+                    enemyField.addAureole(hitShip, Box.AUREOLE);
                     for (Coordinate coord : hitShip.getCoordinates()) {
                         enemyField.set(coord, Box.SUNK);
                     }
@@ -91,7 +91,7 @@ public class Player {
 
     public void placeShips(Ship ship) {
         this.ships.add(ship);
-        this.ownField.addAureole(ship);
+        this.ownField.addAureole(ship, Box.SHIELD);
         for (Coordinate c : ship.getCoordinates()) {
             ownField.set(c, Box.SHIP);
         }

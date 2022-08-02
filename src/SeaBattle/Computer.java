@@ -97,7 +97,7 @@ public class Computer {
                 if (ship.isShipAlive()) {
                     player.getOwnField().set(coordinate, Box.HIT);
                 } else {
-                    enemyField.addAureole(hitShip);
+                    enemyField.addAureole(hitShip, Box.AUREOLE);
                     for (Coordinate coord : hitShip.getCoordinates()) {
                         player.getOwnField().set(coord, Box.SUNK);
                     }

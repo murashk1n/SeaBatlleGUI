@@ -23,10 +23,10 @@ public class GameField {
         }
     }
 
-    public void addAureole(Ship ship) {
+    public void addAureole(Ship ship, Box box) {
         for (Coordinate coordinate : ship.getCoordinates()) {
             for (Coordinate around : Ranges.getCoordinatesAround(coordinate)) {
-                    gamefield[around.x][around.y] = Box.AUREOLE;
+                    gamefield[around.x][around.y] = box;
             }
         }
     }

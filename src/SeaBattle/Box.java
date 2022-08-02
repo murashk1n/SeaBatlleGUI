@@ -9,7 +9,8 @@ public enum Box {
     MISS,
     SHIP,
     OPENED,
-    CLOSED;
+    CLOSED,
+    SHIELD;
 
     public Object image;
 }
