@@ -95,13 +95,11 @@ public class Computer {
                 ship.getCoordinates().remove(coordinate);
                 hitShip.getCoordinates().add(coordinate);
                 if (ship.isShipAlive()) {
-                    //enemyField.set(coordinate, Box.HIT);
                     player.getOwnField().set(coordinate, Box.HIT);
                 } else {
                     enemyField.addAureole(hitShip);
                     for (Coordinate coord : hitShip.getCoordinates()) {
-                        player.getOwnField().set(coordinate, Box.SUNK);
-                        //enemyField.set(coord, Box.SUNK);
+                        player.getOwnField().set(coord, Box.SUNK);
                     }
                     player.getShips().remove(ship);
                     hitShip = new Ship(new ArrayList<>());
@@ -140,13 +138,6 @@ public class Computer {
     private boolean isCoordinateCanBeUsed(Coordinate coordinate) {
         return Ranges.inRange(coordinate) && !isShotDuplicated(coordinate);
     }
-
-//    private Boolean isCoordinateCanBeUsed(Coordinate coordinate) {
-//        if (this.getOwnFieldBox(coordinate) == Box.CLOSED) {
-//            return true;
-//        }
-//        return false;
-//    }
 
     private boolean isShotDuplicated(Coordinate coordinate) {
         return shotCollection.contains(coordinate);
