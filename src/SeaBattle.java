@@ -2,6 +2,8 @@ import SeaBattle.Box;
 import SeaBattle.Coordinate;
 import SeaBattle.Game;
 import SeaBattle.Ranges;
+import SeaBattle.GameStatus;
+import SeaBattle.Computer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +77,7 @@ public class SeaBattle extends JFrame {
                     game.pressLeftButtonOnOwnField(coordinate);
                 }
                 label.setText(getMessage());
-                playerPanel.repaint();
+                mainPanel.repaint();
             }
         });
 
@@ -89,7 +91,7 @@ public class SeaBattle extends JFrame {
                     game.pressLeftButtonOnComputersField(coordinate);
                 }
                 label.setText(getMessage());
-                computerPanel.repaint();
+                mainPanel.repaint();
             }
         });
 

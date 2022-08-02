@@ -83,6 +83,8 @@ public class Player {
                     computer.getShips().remove(ship);
                     hitShip = new Ship(new ArrayList<>());
                 }
+                shotResult = true;
+                break;
             }
         }
     }

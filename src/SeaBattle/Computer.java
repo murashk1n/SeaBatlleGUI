@@ -138,7 +138,7 @@ public class Computer {
     }
 
     private boolean isCoordinateCanBeUsed(Coordinate coordinate) {
-        return Ranges.inRange(coordinate) && isShotDuplicated(coordinate);
+        return Ranges.inRange(coordinate) && !isShotDuplicated(coordinate);
     }
 
 //    private Boolean isCoordinateCanBeUsed(Coordinate coordinate) {
