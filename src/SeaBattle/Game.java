@@ -12,8 +12,6 @@ public class Game {
 
     public Game() {
         Ranges.setSize();
-        computer = new Computer();
-        player = new Player();
     }
 
     public GameStatus getStatus() {
@@ -21,26 +19,33 @@ public class Game {
     }
 
     public void start() {
-        computer.start();
-        player.start();
+        computer = new Computer();
+        player = new Player();
         status = GameStatus.PLACING4;
         list = new ArrayList<>();
         counter = 0;
-
     }
 
-    public GameStatus changeStatus() {
-        if (counter == 0)
-            return status = GameStatus.PLACING4;
-        if (counter == 1 || counter == 2)
-            return status = GameStatus.PLACING3;
-        if (counter == 3 || counter == 4 || counter == 5)
-            return status = GameStatus.PLACING2;
-        if (counter == 6 || counter == 7 || counter == 8 || counter == 9)
-            return status = GameStatus.PLACING1;
-        if (counter == 10)
-            return status = GameStatus.PLAYED;
-        return null;
+    public void changeStatus() {
+        if (counter == 0) {
+            status = GameStatus.PLACING4;
+            return;
+        }
+        if (counter == 1 || counter == 2) {
+            status = GameStatus.PLACING3;
+            return;
+        }
+        if (counter == 3 || counter == 4 || counter == 5) {
+            status = GameStatus.PLACING2;
+            return;
+        }
+        if (counter == 6 || counter == 7 || counter == 8 || counter == 9) {
+            status = GameStatus.PLACING1;
+            return;
+        }
+        if (counter == 10) {
+            status = GameStatus.PLAYED;
+        }
     }
 
     private boolean isNumberOfDeckRight() {
@@ -110,7 +115,7 @@ public class Game {
     }
 
     public void pressLeftButtonOnOwnField(Coordinate coordinate) {
-        if (player.getOwnField().isCellEmpty(coordinate)) {
+        if (player.getOwnFieldBox(coordinate) == Box.CELL) {
             changeStatus();
             if (counter < 10) {
                 player.setShipBox(coordinate);
@@ -132,7 +137,6 @@ public class Game {
         if (player.isShotResult()) {
             if (isHumanWin()) {
                 status = GameStatus.WINNER;
-                checkWhoWin();
             }
         } else {
             status = GameStatus.COMPUTERSTURN;

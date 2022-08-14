@@ -1,7 +1,7 @@
 package SeaBattle;
 
 public class GameField {
-    private Box[][] gamefield;
+    private final Box[][] gamefield;
 
     public GameField(Box defaultBox) {
         gamefield = new Box[Ranges.getSize().x][Ranges.getSize().y];

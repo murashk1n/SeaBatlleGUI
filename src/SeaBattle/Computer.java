@@ -15,10 +15,6 @@ public class Computer {
 
     public Computer() {
         name = "Computer";
-
-    }
-
-    public void start() {
         ships = new ArrayList<>();
         hitShip = new Ship(new ArrayList<>());
         shotCollection = new ArrayList<>();
@@ -54,7 +50,9 @@ public class Computer {
             System.out.println("FIle not found");
         }
 
-        while (scanner.hasNextLine()) {
+        while (true) {
+            assert scanner != null;
+            if (!scanner.hasNextLine()) break;
 
             String line = scanner.nextLine();
             String[] coordinates = line.split(("[.,:;()?!\"\\s–]+"));
@@ -146,14 +144,11 @@ public class Computer {
     private Coordinate chooseCoordinateToShot() {
         if (hitShip.isShipCanBeDefined()) {
             hitShip.defineTypeOfShip();
-            Collections.sort(hitShip.getCoordinates(), new Comparator<Coordinate>() {
-                @Override
-                public int compare(Coordinate o1, Coordinate o2) {
-                    if (hitShip.getTypeOfShip() == "vertical") {
-                        return Integer.compare(o1.x, o2.x);
-                    }
-                    return Integer.compare(o1.y, o2.y);
+            hitShip.getCoordinates().sort((o1, o2) -> {
+                if (hitShip.getTypeOfShip().equals("vertical")) {
+                    return Integer.compare(o1.x, o2.x);
                 }
+                return Integer.compare(o1.y, o2.y);
             });
             if (hitShip.getTypeOfShip().equals("vertical")) {
                 return verticalShipKillStrategy();

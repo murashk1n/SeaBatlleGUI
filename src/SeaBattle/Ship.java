@@ -28,7 +28,7 @@ public class Ship {
             }
         } else if (isShipHorizontal()) {
             for (int i = 1; i < coordinates.size(); i++) {
-                if (coordinates.get(0).y+i != coordinates.get(i).y) {
+                if (coordinates.get(0).y + i != coordinates.get(i).y) {
                     return false;
                 }
             }

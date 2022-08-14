@@ -15,15 +15,12 @@ public class Player {
 
     public Player() {
         name = "Andrei";
-
-    }
-
-    public void start() {
         ships = new ArrayList<>();
         hitShip = new Ship(new ArrayList<>());
         shotResult = true;
         ownField = new GameField(Box.CELL);
         enemyField = new GameField(Box.CLOSED);
+
     }
 
     public void setShotResult() {
