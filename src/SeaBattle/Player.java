@@ -1,26 +1,57 @@
 package SeaBattle;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+public abstract class Player {
+    String name;
+    GameField ownField;
+    GameField enemyField;
+    boolean shotResult;
+    List<Ship> ships;
+    Ship hitShip;
 
-public class Player {
-    private String name;
-    private GameField ownField;
-    private GameField enemyField;
-    private boolean shotResult;
-    private List<Ship> ships;
-    private Ship hitShip;
+    Player opponent;
 
     public Player() {
-        name = "Andrei";
+        name = null;
         ships = new ArrayList<>();
         hitShip = new Ship(new ArrayList<>());
         shotResult = true;
         ownField = new GameField(Box.CELL);
         enemyField = new GameField(Box.CLOSED);
+    }
 
+    public void successfulShot(Coordinate coordinate) {
+        shotResult = true;
+        for (Ship ship : opponent.getShips()) {
+            if (ship.getCoordinates().contains(coordinate)) {
+                ship.getCoordinates().remove(coordinate);
+                hitShip.getCoordinates().add(coordinate);
+
+                if (ship.isShipAlive()) {
+                    opponent.ownField.set(coordinate, Box.HIT);
+                    break;
+                } else {
+                    opponent.ownField.addAureole(hitShip, Box.AUREOLE);
+                    enemyField.addAureole(hitShip, Box.OPENED);
+                    for (Coordinate coord : hitShip.getCoordinates()) {
+                        opponent.ownField.set(coord, Box.SUNK);
+                    }
+                    opponent.getShips().remove(ship);
+                    hitShip = new Ship(new ArrayList<>());
+                }
+                break;
+            }
+        }
+    }
+
+    public void placeShips(Ship ship) {
+        this.ships.add(ship);
+        this.ownField.addAureole(ship, Box.SHIELD);
+        for (Coordinate c : ship.getCoordinates()) {
+            ownField.set(c, Box.SHIP);
+        }
     }
 
     public void setShotResult() {
@@ -51,49 +82,8 @@ public class Player {
         ownField.set(coordinate, Box.OPENED);
     }
 
-    public void attack(Computer computer, Coordinate coordinate) {
-        enemyField.set(coordinate, Box.OPENED);
-        switch (computer.getOwnFieldBox(coordinate)) {
-            case SHIP:
-                successfulShot(computer, coordinate);
-                shotResult = true;
-                break;
-            default:
-                enemyField.set(coordinate, Box.MISS);
-                shotResult = false;
-        }
+    public void setOpponent(Player opponent) {
+        this.opponent = opponent;
     }
-
-    private void successfulShot(Computer computer, Coordinate coordinate) {
-        for (Ship ship : computer.getShips()) {
-            if (ship.getCoordinates().contains(coordinate)) {
-                ship.getCoordinates().remove(coordinate);
-                hitShip.getCoordinates().add(coordinate);
-                if (ship.isShipAlive()) {
-                    enemyField.set(coordinate, Box.HIT);
-                    break;
-                } else {
-                    enemyField.addAureole(hitShip, Box.AUREOLE);
-                    for (Coordinate coord : hitShip.getCoordinates()) {
-                        enemyField.set(coord, Box.SUNK);
-                    }
-                    computer.getShips().remove(ship);
-                    hitShip = new Ship(new ArrayList<>());
-                }
-                shotResult = true;
-                break;
-            }
-        }
-    }
-
-    public void placeShips(Ship ship) {
-        this.ships.add(ship);
-        this.ownField.addAureole(ship, Box.SHIELD);
-        for (Coordinate c : ship.getCoordinates()) {
-            ownField.set(c, Box.SHIP);
-        }
-    }
-
 
 }
-

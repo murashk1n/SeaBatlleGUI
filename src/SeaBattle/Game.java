@@ -1,11 +1,15 @@
 package SeaBattle;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Game {
+public class Game implements ActionListener {
+    Timer timer = new Timer(300, this);
     private Computer computer;
-    private Player player;
+    private Human human;
     private GameStatus status;
     private List<Coordinate> list;
     private int counter;
@@ -19,8 +23,11 @@ public class Game {
     }
 
     public void start() {
-        computer = new Computer();
-        player = new Player();
+        timer.start();
+        this.human = new Human();
+        this.computer = new Computer();
+        human.setOpponent(computer);
+        computer.setOpponent(human);
         status = GameStatus.PLACING4;
         list = new ArrayList<>();
         counter = 0;
@@ -68,7 +75,7 @@ public class Game {
         if (status == GameStatus.COMPUTERSTURN) {
             while (computer.isShotResult()) {
                 if (!isComputerWin()) {
-                    computer.attack(player);
+                    computer.attack();
                 } else {
                     status = GameStatus.LOOSED;
                 }
@@ -78,21 +85,21 @@ public class Game {
     }
 
     public Box getComputerBox(Coordinate coordinate) {
-        if (player.getEnemyFieldBox(coordinate) == Box.OPENED) {
+        if (human.getEnemyFieldBox(coordinate) == Box.OPENED) {
             return computer.getOwnFieldBox(coordinate);
         } else {
-            return player.getEnemyFieldBox(coordinate);
+            return human.getEnemyFieldBox(coordinate);
         }
     }
 
     public Box getOwnBox(Coordinate coordinate) {
-        return player.getOwnFieldBox(coordinate);
+        return human.getOwnFieldBox(coordinate);
     }
 
     public void pressLeftButtonOnComputersField(Coordinate coordinate) {
         checkWhoWin();
         if (status == GameStatus.PLAYED) {
-            if (player.getEnemyFieldBox(coordinate) == Box.CLOSED) {
+            if (human.getEnemyFieldBox(coordinate) == Box.CLOSED) {
                 leftButtonActionOnComputersField(coordinate);
             }
         }
@@ -103,7 +110,7 @@ public class Game {
         if (isNumberOfDeckRight()) {
             Ship ship = new Ship(list);
             if (ship.isShipValid()) {
-                player.placeShips(ship);
+                human.placeShips(ship);
                 list = new ArrayList<>();
                 counter++;
             } else {
@@ -115,10 +122,10 @@ public class Game {
     }
 
     public void pressLeftButtonOnOwnField(Coordinate coordinate) {
-        if (player.getOwnFieldBox(coordinate) == Box.CELL) {
+        if (human.getOwnFieldBox(coordinate) == Box.CELL) {
             changeStatus();
             if (counter < 10) {
-                player.setShipBox(coordinate);
+                human.setShipBox(coordinate);
                 leftButtonOnOwnFieldAction(coordinate);
             }
         } else {
@@ -128,19 +135,19 @@ public class Game {
 
     private void notValidShipAction() {
         for (Coordinate coordinate : list) {
-            player.getOwnField().set(coordinate, Box.CELL);
+            human.getOwnField().set(coordinate, Box.CELL);
         }
     }
 
     private void leftButtonActionOnComputersField(Coordinate coordinate) {
-        player.attack(computer, coordinate);
-        if (player.isShotResult()) {
+        human.attack(coordinate);
+        if (human.isShotResult()) {
             if (isHumanWin()) {
                 status = GameStatus.WINNER;
             }
         } else {
             status = GameStatus.COMPUTERSTURN;
-            computersAction();
+            // computersAction();
         }
         resetShotResult();
     }
@@ -151,7 +158,7 @@ public class Game {
     }
 
     private boolean isComputerWin() {
-        return player.getShips().size() == 0;
+        return human.getShips().size() == 0;
     }
 
     private void checkWhoWin() {
@@ -164,7 +171,12 @@ public class Game {
     }
 
     private void resetShotResult() {
-        player.setShotResult();
+        human.setShotResult();
         computer.setShotResult();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        computersAction();
     }
 }

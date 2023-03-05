@@ -3,69 +3,47 @@ package SeaBattle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
-public class Computer {
-    private String name;
-    private GameField ownField;
-    private GameField enemyField;
-    private boolean shotResult;
-    private List<Ship> ships;
-    private Ship hitShip;
-    private List<Coordinate> shotCollection;
+public class Computer extends Player {
+     private final List<Coordinate> shotCollection;
 
     public Computer() {
         name = "Computer";
-        ships = new ArrayList<>();
-        hitShip = new Ship(new ArrayList<>());
         shotCollection = new ArrayList<>();
-        shotResult = true;
-        ownField = new GameField(Box.CELL);
-        enemyField = new GameField(Box.CELL);
-        placeShips();
+        getCoordinateFromFile();
     }
 
-    public boolean isShotResult() {
-        return shotResult;
-    }
-
-    public void setShotResult() {
-        this.shotResult = true;
-    }
-
-    public List<Ship> getShips() {
-        return ships;
-    }
-
-    private File getFile(int number) {
-        String filename = "res/coordinates/" + number + ".txt";
+    private File getFile() {
+        int random = (int) (1 + Math.random() * 4);
+        String filename = "res/coordinates/" + random + ".txt";
         return new File(filename);
     }
 
-    private void placeShips() {
-        int random = (int) (1 + Math.random() * 4);
+    private void getCoordinateFromFile() {
         Scanner scanner = null;
         try {
-            scanner = new Scanner(getFile(random));
+            scanner = new Scanner(getFile());
         } catch (FileNotFoundException e) {
             System.out.println("FIle not found");
         }
-
-        while (true) {
-            assert scanner != null;
-            if (!scanner.hasNextLine()) break;
-
+        while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            String[] coordinates = line.split(("[.,:;()?!\"\\s–]+"));
-
+            String[] coordinates = line.split(("[,;]"));
             Ship ship = new Ship(Coordinate.coordinatesParseInt(coordinates));
-            for (Coordinate coordinate : ship.getCoordinates()) {
-                this.ownField.set(coordinate, Box.SHIP);
-            }
             this.ships.add(ship);
+            placeShips(ship);
         }
     }
 
-    public void attack(Player player) {
+    public void placeShips(Ship ship) {
+        for (Coordinate coordinate : ship.getCoordinates()) {
+            this.ownField.set(coordinate, Box.SHIP);
+        }
+    }
+
+    public void attack() {
         Coordinate coordinate;
         if (hitShip.isHitShip()) {
             coordinate = chooseCoordinateToShot();
@@ -73,37 +51,14 @@ public class Computer {
             coordinate = Ranges.getRandomCoordinate();
         }
         if (isShotDuplicated(coordinate)) {
-            attack(player);
+            attack();
         } else {
             shotCollection.add(coordinate);
-            switch (player.getOwnFieldBox(coordinate)) {
-                case SHIP:
-                    successfulShot(player, coordinate);
-                    break;
-                default:
-                    player.getOwnField().set(coordinate, Box.MISS);
-                    shotResult = false;
-            }
-        }
-    }
-
-    private void successfulShot(Player player, Coordinate coordinate) {
-        for (Ship ship : player.getShips()) {
-            if (ship.getCoordinates().contains(coordinate)) {
-                ship.getCoordinates().remove(coordinate);
-                hitShip.getCoordinates().add(coordinate);
-                if (ship.isShipAlive()) {
-                    player.getOwnField().set(coordinate, Box.HIT);
-                } else {
-                    enemyField.addAureole(hitShip, Box.AUREOLE);
-                    for (Coordinate coord : hitShip.getCoordinates()) {
-                        player.getOwnField().set(coord, Box.SUNK);
-                    }
-                    player.getShips().remove(ship);
-                    hitShip = new Ship(new ArrayList<>());
-                }
-                shotResult = true;
-                break;
+            if (opponent.getOwnFieldBox(coordinate) == Box.SHIP) {
+                successfulShot(coordinate);
+            } else {
+                opponent.ownField.set(coordinate, Box.MISS);
+                shotResult = false;
             }
         }
     }
@@ -133,13 +88,6 @@ public class Computer {
         return verticalShipKillStrategy();
     }
 
-    private boolean isCoordinateCanBeUsed(Coordinate coordinate) {
-        return Ranges.inRange(coordinate) && !isShotDuplicated(coordinate);
-    }
-
-    private boolean isShotDuplicated(Coordinate coordinate) {
-        return shotCollection.contains(coordinate);
-    }
 
     private Coordinate chooseCoordinateToShot() {
         if (hitShip.isShipCanBeDefined()) {
@@ -152,9 +100,8 @@ public class Computer {
             });
             if (hitShip.getTypeOfShip().equals("vertical")) {
                 return verticalShipKillStrategy();
-            } else {
-                return horizontalShipKillStrategy();
             }
+            return horizontalShipKillStrategy();
         }
         return chooseCoordinateAround();
     }
@@ -166,6 +113,14 @@ public class Computer {
         } else {
             return horizontalShipKillStrategy();
         }
+    }
+
+    private boolean isCoordinateCanBeUsed(Coordinate coordinate) {
+        return Ranges.inRange(coordinate) && !isShotDuplicated(coordinate);
+    }
+
+    private boolean isShotDuplicated(Coordinate coordinate) {
+        return shotCollection.contains(coordinate);
     }
 
     public Box getOwnFieldBox(Coordinate coordinate) {

@@ -1,20 +1,20 @@
-import SeaBattle.Box;
-import SeaBattle.Coordinate;
-import SeaBattle.Game;
-import SeaBattle.Ranges;
-import SeaBattle.GameStatus;
-import SeaBattle.Computer;
+package SeaBattle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
-public class SeaBattle extends JFrame {
-    private Game game;
-    private JPanel mainPanel = new JPanel();
-    private JPanel computerPanel;
-    private JPanel playerPanel;
+public class SeaBattle extends JFrame implements ActionListener {
+    Timer timer = new Timer(1, this);
+    private final Game game;
+    private static final JPanel mainPanel = new JPanel();
+    private static JPanel computerPanel;
+
+    private static JPanel playerPanel;
     private JLabel label;
     private final int IMAGE_SIZE = 50;
 
@@ -29,6 +29,7 @@ public class SeaBattle extends JFrame {
         initLabel();
         initPanel();
         initFrame();
+        timer.start();
     }
 
     private void initFrame() {
@@ -77,7 +78,6 @@ public class SeaBattle extends JFrame {
                     game.pressLeftButtonOnOwnField(coordinate);
                 }
                 label.setText(getMessage());
-                mainPanel.repaint();
             }
         });
 
@@ -91,7 +91,6 @@ public class SeaBattle extends JFrame {
                     game.pressLeftButtonOnComputersField(coordinate);
                 }
                 label.setText(getMessage());
-                mainPanel.repaint();
             }
         });
 
@@ -102,7 +101,6 @@ public class SeaBattle extends JFrame {
                     game.start();
                 }
                 label.setText(getMessage());
-                mainPanel.repaint();
             }
         });
         computerPanel.setPreferredSize(setDimension());
@@ -122,32 +120,19 @@ public class SeaBattle extends JFrame {
     }
 
     private String getMessage() {
-        switch (game.getStatus()) {
-            case HIT:
-                return "Hit";
-            case OCCUPIED:
-                return "Cells are occupied!";
-            case COMPUTERSTURN:
-                return "Computer's turn";
-            case NOTVALIDSHIP:
-                return "Ship is not valid!";
-            case PLACING4:
-                return "Place 4-deck ship";
-            case PLACING3:
-                return "Place 3-deck ship";
-            case PLACING2:
-                return "Place 2-deck ship";
-            case PLACING1:
-                return "Place 1-deck ship";
-            case PLAYED:
-                return "Please, make the turn";
-            case LOOSED:
-                return "YOU LOSE!";
-            case WINNER:
-                return "Player win!";
-            default:
-                return "Welcome!";
-        }
+        return switch (game.getStatus()) {
+            case HIT -> "Hit";
+            case OCCUPIED -> "Cells are occupied!";
+            case COMPUTERSTURN -> "Computer's turn";
+            case NOTVALIDSHIP -> "Ship is not valid!";
+            case PLACING4 -> "Place 4-deck ship";
+            case PLACING3 -> "Place 3-deck ship";
+            case PLACING2 -> "Place 2-deck ship";
+            case PLACING1 -> "Place 1-deck ship";
+            case PLAYED -> "Please, make the turn";
+            case LOOSED -> "YOU LOSE!";
+            case WINNER -> "Player win!";
+        };
     }
 
     private void initLabel() {
@@ -162,8 +147,15 @@ public class SeaBattle extends JFrame {
     }
 
     private Image getImage(String name) {
-        String filename = "img/" + name + ".png";
-        ImageIcon icon = new ImageIcon(getClass().getResource(filename));
+        String filename = "../img/" + name + ".png";
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(getClass().getResource(filename)));
         return icon.getImage();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        mainPanel.repaint();
+        computerPanel.repaint();
+        playerPanel.repaint();
     }
 }

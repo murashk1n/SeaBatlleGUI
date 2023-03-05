@@ -19,7 +19,6 @@ public class Ship {
     }
 
     public boolean isShipValid() {
-
         if (isShipVertical()) {
             for (int i = 1; i < coordinates.size(); i++) {
                 if (coordinates.get(0).x + i != coordinates.get(i).x) {

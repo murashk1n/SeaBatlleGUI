@@ -8,10 +8,10 @@ public class Test {
 //    private final int IMAGE_SIZE = 50;
 //
 //    public static void main(String[] args) {
-//        new SeaBattle();
+//        new SeaBattle.SeaBattle();
 //    }
 //
-//    private SeaBattle() {
+//    private SeaBattle.SeaBattle() {
 //        game = new Game();
 //        game.start();
 //        setImage();
